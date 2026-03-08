@@ -13,7 +13,7 @@ export default function GeneralContactFunnel() {
     e.preventDefault();
     setStatus('loading');
     
-    const WEBHOOK_URL = process.env.NEXT_PUBLIC_IRON_SUMMIT_WEBHOOK_URL || ''; 
+    const WEBHOOK_URL = 'https://hook.us2.make.com/u12uc1lkdniqqsffx4lae316dq7wods9'; 
 
     try {
       const response = await fetch(WEBHOOK_URL, {
