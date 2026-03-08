@@ -1,10 +1,10 @@
-﻿'use client';
-import { useState } from 'react';
+﻿
+'use client';
+import React, { useState } from 'react';
 
 export default function Anthracite() {
   const [status, setStatus] = useState('idle');
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {    e.preventDefault();
     setStatus('loading');
     const res = await fetch('/api/intake', {
       method: 'POST',
