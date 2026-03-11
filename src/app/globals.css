@@ -6,12 +6,13 @@
 }
 
 :root {
-  background: #060D09;
+  background-color: #060D09;
   color: white;
 }
 
-/* Hard-reset to prevent giant SVG if CSS fails */
+/* Force-shrink that giant lock icon even if Tailwind fails */
 svg {
-  max-width: 100%;
-  height: auto;
+  width: 20px !important;
+  height: 20px !important;
+  display: inline-block !important;
 }
