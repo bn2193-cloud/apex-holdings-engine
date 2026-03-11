@@ -10,7 +10,8 @@
   color: white;
 }
 
-body {
-  margin: 0;
-  padding: 0;
+/* Hard-reset to prevent giant SVG if CSS fails */
+svg {
+  max-width: 100%;
+  height: auto;
 }
