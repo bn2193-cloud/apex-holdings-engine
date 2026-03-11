@@ -1,81 +1,75 @@
-import { createClient } from '@supabase/supabase-js';
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
-// This is a Server Component - it securely queries the vault before the page even loads.
-export default async function ThreatMatrixReport({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  
-  const supabase = createClient(
-    'https://aktbbqvxtwyernosxphh.supabase.co',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-  );
+export default function MissionControl() {
+  const [dossiers, setDossiers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: lead, error } = await supabase
-    .from('leads')
-    .select('*')
-    .eq('id', resolvedParams.id)
-    .single();
-
-  if (error || !lead) {
-    return <div className="min-h-screen bg-black text-red-500 font-mono p-20 uppercase tracking-widest text-xs">Error: Dossier Decryption Failed. Record not found.</div>;
-  }
+  useEffect(() => {
+    // We'll wire this to your API shortly
+    setLoading(false);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white text-black font-mono p-12 max-w-4xl mx-auto">
-      {/* Print Instruction (Hides when printing) */}
-      <div className="print:hidden mb-8 flex justify-between items-center bg-slate-100 p-4 border border-slate-300">
-        <span className="text-xs uppercase tracking-widest text-slate-500">Press Ctrl+P (or Cmd+P) to Export as PDF</span>
-        <button className="bg-black text-white px-6 py-2 text-xs font-black uppercase hover:bg-cyan-600 transition-colors" suppressHydrationWarning>
-          Ready for Export
-        </button>
+    <div className="mission-control">
+      <style dangerouslySetInnerHTML={{ __html: `
+        body { background-color: #060D09 !important; margin: 0; color: white; font-family: sans-serif; }
+        .mission-control { min-height: 100vh; padding: 40px; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #ffffff11; padding-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid #ffffff11; padding: 20px; border-radius: 8px; }
+        .table-container { margin-top: 40px; background: rgba(10, 15, 12, 0.95); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(255, 215, 0, 0.05); color: #FFD700; padding: 15px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #ffffff05; color: #cbd5e1; }
+        .gold { color: #FFD700; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; background: #1A4B2C; color: white; }
+      `}} />
+
+      <div className="header">
+        <div>
+          <h1 style={{ margin: 0, fontSize: '24px' }}>MISSION <span className="gold">CONTROL</span></h1>
+          <p style={{ color: '#64748b', fontSize: '12px', marginTop: '4px' }}>APEX HOLDINGS INTELLIGENCE TERMINAL</p>
+        </div>
+        <Link href="/iron-summit" style={{ color: '#64748b', textDecoration: 'none', fontSize: '12px' }}>← VIEW PORTAL</Link>
       </div>
 
-      {/* The Tactical Printable Dossier */}
-      <div className="border-4 border-black p-12 relative">
-        <div className="absolute top-0 right-0 bg-black text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest">Confidential</div>
-        
-        <div className="border-b-2 border-black pb-8 mb-8 flex justify-between items-end">
-          <div>
-            <h1 className="text-4xl font-black tracking-tighter uppercase mb-2">ANTHRACITE</h1>
-            <p className="text-xs uppercase tracking-[0.3em] text-gray-500">Vulnerability Audit // Threat Matrix</p>
-          </div>
-          <div className="text-right text-[10px] uppercase">
-            <div>Date: {new Date().toLocaleDateString()}</div>
-            <div>Ref: AX-{lead.id}-TKT</div>
-          </div>
+      <div className="grid">
+        <div className="stat-card">
+          <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '10px' }}>TOTAL DOSSIERS</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>24</div>
         </div>
+        <div className="stat-card">
+          <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '10px' }}>ACTIVE MANDATES</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#FFD700' }}>12</div>
+        </div>
+        <div className="stat-card">
+          <div style={{ fontSize: '10px', color: '#64748b', marginBottom: '10px' }}>SYSTEM STATUS</div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10b981' }}>SECURE</div>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-12 border-b border-gray-300 pb-8">
-          <div>
-            <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-1">Target Entity</div>
-            <div className="text-sm font-bold">{lead.email}</div>
-          </div>
-          <div>
-            <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-1">Origin Node</div>
-            <div className="text-sm font-bold">{lead.source}</div>
-          </div>
-        </div>
-
-        <div className="mb-12">
-          <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4">Tektite Sentinel Analysis</div>
-          <div className="bg-gray-100 p-6 border-l-4 border-black">
-            <div className="text-sm font-bold uppercase mb-2">{lead.notes?.replace('[SENTINEL REPORT]', '').trim() || 'Tier 3 | Standard Intake'}</div>
-            <p className="text-xs text-gray-600 italic mt-4">
-              "Based on initial ingestion parameters, the target exhibits markers requiring strategic review. Recommend immediate deployment of Iron Summit advisory protocols to secure vulnerable assets."
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-12">
-          <div className="text-[9px] uppercase tracking-widest text-gray-400 mb-4">Ingested Intelligence (Raw)</div>
-          <p className="text-xs leading-relaxed font-serif bg-gray-50 p-6 border border-gray-200">
-            {lead.details || 'No extended intelligence provided during initial intake.'}
-          </p>
-        </div>
-
-        <div className="mt-20 pt-8 border-t border-gray-300 text-center">
-          <p className="text-[8px] uppercase tracking-widest text-gray-400 font-bold">Generated by Tektite Industries // An Apex Holdings LLC Division</p>
-          <p className="text-[7px] uppercase tracking-widest text-gray-400 mt-2">NOT FOR PUBLIC DISTRIBUTION</p>
-        </div>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Principal</th>
+              <th>Email Address</th>
+              <th>Mandate Focus</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Verification Test</td>
+              <td>test@apex.com</td>
+              <td>Wealth Accumulation</td>
+              <td><span className="badge">NEW</span></td>
+            </tr>
+            {/* Real data will map here */}
+          </tbody>
+        </table>
       </div>
     </div>
   );
