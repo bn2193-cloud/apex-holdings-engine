@@ -8,17 +8,17 @@
     "start": "next start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "latest",
-    "lucide-react": "latest",
-    "next": "latest",
+    "next": "16.1.6",
     "react": "latest",
     "react-dom": "latest",
-    "resend": "^6.9.3"
+    "lucide-react": "latest",
+    "@supabase/supabase-js": "latest",
+    "resend": "latest"
   },
   "devDependencies": {
+    "typescript": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "typescript": "latest"
+    "@types/react-dom": "latest"
   }
 }
