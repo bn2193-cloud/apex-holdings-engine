@@ -10,9 +10,16 @@
   color: white;
 }
 
-/* Force-shrink that giant lock icon even if Tailwind fails */
+/* EMERGENCY FAIL-SAFE: This forces the lock icon to be 24px no matter what */
 svg {
-  width: 20px !important;
-  height: 20px !important;
+  width: 24px !important;
+  height: 24px !important;
   display: inline-block !important;
+}
+
+/* This allows headers and the form to still look decent if Tailwind fails */
+body {
+  background-color: #060D09 !important;
+  margin: 0;
+  font-family: sans-serif;
 }
