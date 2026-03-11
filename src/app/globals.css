@@ -1,25 +1,18 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-gold: #FFD700;
-  --color-brand-green: #1A4B2C;
-}
-
+/* FAIL-SAFE: If Tailwind fails, these basic styles keep the site readable */
 :root {
   background-color: #060D09;
   color: white;
 }
 
-/* EMERGENCY FAIL-SAFE: This forces the lock icon to be 24px no matter what */
-svg {
-  width: 24px !important;
-  height: 24px !important;
-  display: inline-block !important;
-}
-
-/* This allows headers and the form to still look decent if Tailwind fails */
 body {
   background-color: #060D09 !important;
+  color: white !important;
   margin: 0;
   font-family: sans-serif;
 }
+
+/* Force specific colors for your Fintech feel even without Tailwind */
+.text-brand-gold { color: #FFD700; }
+.bg-brand-green { background-color: #1A4B2C; }
