@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-gold: #FFD700;
+  --color-brand-green: #1A4B2C;
+}
+
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  background: #060D09;
+  color: white;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: transparent;
+  margin: 0;
+  padding: 0;
 }

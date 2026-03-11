@@ -1,22 +1,19 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Apex Holdings",
-  description: "Generational Wealth & Technology Architecture",
+  description: "Institutional Finance & Technology",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body style={{ margin: 0 }}>{children}</body>
     </html>
   );
 }
