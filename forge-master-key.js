@@ -8,8 +8,9 @@ try {
   const proxyCode = `import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Next.js 16 now requires the function to be named 'proxy'
-export function proxy(request: NextRequest) {
+// Next.js 16 now requires the function to be named 'middleware' OR 'proxy' 
+// but specifically exported for the 'proxy' convention.
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/admin')) {
@@ -22,11 +23,15 @@ export function proxy(request: NextRequest) {
       });
     }
 
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const user = auth[0];
-    const pass = auth[1];
+    try {
+      const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+      const user = auth[0];
+      const pass = auth[1];
 
-    if (user !== 'apex' || pass !== 'summit2026') {
+      if (user !== 'apex' || pass !== 'summit2026') {
+        throw new Error('Invalid');
+      }
+    } catch (e) {
       return new NextResponse('Invalid Credentials', {
         status: 401,
         headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"' },
@@ -37,15 +42,14 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Ensure the config still targets the right paths
 export const config = {
   matcher: ['/admin/:path*'],
 };`;
 
   fs.writeFileSync('./src/proxy.ts', proxyCode);
-  console.log("✅ src/proxy.ts updated with correct 'proxy' function export.");
+  console.log("✅ src/proxy.ts updated.");
 
-  // 2. Clean up next.config.mjs to remove the rejected 'eslint' key
+  // 2. Clean up next.config.mjs to remove the rejected keys
   const nextConfig = `/** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: { ignoreBuildErrors: true },
@@ -57,10 +61,10 @@ export default nextConfig;`;
   // 3. BLAST IT
   console.log("🚀 FORCING MASTER KEY TO VERCEL...");
   execSync('git add .');
-  execSync('git commit -m "FIX: Satisfy Next 16 proxy export requirements"');
+  execSync('git commit -m "FIX: Final Proxy/Middleware naming alignment"');
   execSync('git push');
   
-  console.log("\n🟢 DONE. Refresh Vercel and watch the deployment.");
+  console.log("\n🟢 DONE. Watch Vercel for the green light.");
 
 } catch (err) {
   console.error("⚠️ HALTED: ", err.message);

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Next.js 16 now requires the function to be named 'proxy'
-export function proxy(request: NextRequest) {
+// Next.js 16 now requires the function to be named 'middleware' OR 'proxy' 
+// but specifically exported for the 'proxy' convention.
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/admin')) {
@@ -15,11 +16,15 @@ export function proxy(request: NextRequest) {
       });
     }
 
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const user = auth[0];
-    const pass = auth[1];
+    try {
+      const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+      const user = auth[0];
+      const pass = auth[1];
 
-    if (user !== 'apex' || pass !== 'summit2026') {
+      if (user !== 'apex' || pass !== 'summit2026') {
+        throw new Error('Invalid');
+      }
+    } catch (e) {
       return new NextResponse('Invalid Credentials', {
         status: 401,
         headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"' },
@@ -30,7 +35,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Ensure the config still targets the right paths
 export const config = {
   matcher: ['/admin/:path*'],
 };
