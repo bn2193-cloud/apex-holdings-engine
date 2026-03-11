@@ -1,28 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export function middleware(req: NextRequest) {
-  const basicAuth = req.headers.get('authorization');
+// Next.js 16 now requires the function to be named 'proxy'
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (basicAuth) {
-    const authValue = basicAuth.split(' ')[1];
-    const [user, pwd] = atob(authValue).split(':');
+  if (pathname.startsWith('/admin')) {
+    const authHeader = request.headers.get('authorization');
 
-    // 👇 You can change 'admin' and 'Apex2026' to whatever credentials you want
-    if (user === 'admin' && pwd === 'Apex2026') {
-      return NextResponse.next();
+    if (!authHeader) {
+      return new NextResponse('Authentication Required', {
+        status: 401,
+        headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"' },
+      });
+    }
+
+    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    const user = auth[0];
+    const pass = auth[1];
+
+    if (user !== 'apex' || pass !== 'summit2026') {
+      return new NextResponse('Invalid Credentials', {
+        status: 401,
+        headers: { 'WWW-Authenticate': 'Basic realm="Secure Area"' },
+      });
     }
   }
 
-  // If the password is wrong or missing, Vercel instantly drops the connection
-  return new NextResponse('ACCESS DENIED: Mission Control Locked.', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Apex Secure Area"',
-    },
-  });
+  return NextResponse.next();
 }
 
-// This tells the bouncer to ONLY protect the admin folder and its sub-pages
+// Ensure the config still targets the right paths
 export const config = {
   matcher: ['/admin/:path*'],
 };
