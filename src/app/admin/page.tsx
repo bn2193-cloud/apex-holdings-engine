@@ -1,74 +1,105 @@
-﻿'use client';
-import { useState, useEffect } from 'react';
-import { getLeads } from './actions';
+﻿import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 
-export default function ApexDashboard() {
-  const [leads, setLeads] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Forces Next.js to always fetch fresh data, never cache it
+export const revalidate = 0; 
 
-  useEffect(() => {
-    getLeads()
-      .then(setLeads)
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+export default async function MissionControl() {
+  // Initialize the secure connection
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-  if (error) return <div className="p-8 text-red-500 font-mono text-xs uppercase">System Breach: {error}</div>;
+  // Pull the dossiers from the vault
+  const { data: leads, error } = await supabase
+    .from('iron_summit_leads')
+    .select('*')
+    .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-black text-slate-300 font-mono p-8">
-      <div className="flex justify-between items-end border-b border-slate-800 pb-6 mb-8">
-        <div>
-          <h1 className="text-2xl font-black tracking-tighter text-white uppercase italic">
-            APEX<span className="text-blue-600">HOLDINGS</span>
-          </h1>
-          <p className="text-[10px] text-slate-500 uppercase tracking-[0.4em]">Mission Control // Tektite Intelligence</p>
-        </div>
-        <div className="text-right text-xs text-emerald-500 animate-pulse">● ENGINES ONLINE</div>
+    <div className="min-h-screen bg-[#1C1C1C] text-[#E0E0E0] font-sans selection:bg-[#007FFF] selection:text-white p-8">
+      
+      {/* Abstract Blueprint Grid */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none" 
+           style={{ backgroundImage: 'radial-gradient(#007FFF 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
       </div>
 
-      {loading ? (
-        <div className="text-center animate-pulse text-[10px]">Scanning Database...</div>
-      ) : (
-        <div className="border border-slate-800 bg-slate-950/30 overflow-hidden">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900/80 text-slate-500 uppercase text-[9px] tracking-widest border-b border-slate-800">
-              <tr>
-                <th className="p-4">Timestamp</th>
-                <th className="p-4">Entity</th>
-                <th className="p-4">Identity</th>
-                <th className="p-4">Sentinel Analysis</th>
-                <th className="p-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-900">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-slate-900/50 transition-colors">
-                  <td className="p-4 text-slate-600">{new Date(lead.created_at).toLocaleDateString()}</td>
-                  <td className="p-4 font-bold text-white tracking-tighter">{lead.primary_concern}</td>
-                  <td className="p-4 text-slate-400">{lead.email}</td>
-                  <td className="p-4">
-                    <span className="px-3 py-1 border border-slate-800 text-[9px] font-black uppercase tracking-tighter text-cyan-500">
-                      {lead.notes?.split('|')[0].replace('[SENTINEL REPORT]', '').trim() || 'Tier 3 (Standard)'}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    <Link 
-                      href={`/admin/report/${lead.id}`} 
-                      target="_blank" 
-                      className="bg-white text-black px-4 py-2 text-[9px] font-black uppercase hover:bg-cyan-500 hover:text-white transition-colors"
-                    >
-                      Mint Dossier
-                    </Link>
-                  </td>
+      <div className="max-w-7xl mx-auto relative z-10 space-y-8">
+        {/* Header */}
+        <header className="flex justify-between items-end border-b border-[#007FFF]/30 pb-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold tracking-widest uppercase text-[#E0E0E0]">
+              Mission <span className="text-[#007FFF]">Control</span>
+            </h1>
+            <p className="text-xs tracking-[0.3em] text-[#E0E0E0]/50 uppercase">
+              Apex Holdings Central CRM • Live Feed
+            </p>
+          </div>
+          <Link href="/" className="text-xs tracking-widest uppercase text-[#007FFF] hover:text-white transition-colors border border-[#007FFF]/30 px-4 py-2 bg-[#007FFF]/10">
+            Exit to Lobby
+          </Link>
+        </header>
+
+        {/* CRM Data Grid */}
+        <div className="bg-black/50 border border-[#333] backdrop-blur-md overflow-hidden">
+          <div className="p-4 border-b border-[#333] bg-[#111] flex justify-between items-center">
+            <h2 className="text-sm font-bold tracking-widest uppercase text-[#007FFF]">Iron Summit • Active Dossiers</h2>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-xs text-[#E0E0E0]/50 tracking-widest uppercase">System Online</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-[#1C1C1C] text-[#E0E0E0]/60 text-xs uppercase tracking-widest">
+                <tr>
+                  <th className="px-6 py-4 font-normal">Timestamp</th>
+                  <th className="px-6 py-4 font-normal">Principal Name</th>
+                  <th className="px-6 py-4 font-normal">Secure Contact</th>
+                  <th className="px-6 py-4 font-normal">Advisory Focus</th>
+                  <th className="px-6 py-4 font-normal text-right">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#333]">
+                {error ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-red-500 tracking-widest">
+                      Vault Access Error: {error.message}
+                    </td>
+                  </tr>
+                ) : leads && leads.length > 0 ? (
+                  leads.map((lead: any) => (
+                    <tr key={lead.id} className="hover:bg-[#007FFF]/5 transition-colors group">
+                      <td className="px-6 py-4 text-[#E0E0E0]/50">
+                        {new Date(lead.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 font-bold text-[#E0E0E0]">{lead.name}</td>
+                      <td className="px-6 py-4 text-[#007FFF]">{lead.email}</td>
+                      <td className="px-6 py-4">
+                        <span className="bg-[#333] px-3 py-1 text-xs rounded-sm tracking-wide">
+                          {lead.focus}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-xs border border-yellow-500/50 text-yellow-500 px-2 py-1 bg-yellow-950/30 uppercase tracking-widest">
+                          Pending Review
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-[#E0E0E0]/50 tracking-widest uppercase">
+                      No Active Dossiers Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
